@@ -45,21 +45,28 @@
             },
             resolve: function(route, options) {
               var count, pattern;
-              pattern = /(\:\w+)/g;
+              pattern = /(\:\w+)([\?])?/g;
               if (route === void 0) {
                 throw new Error("Can't resolve undefined into a route");
               }
               count = 0;
               return prefix + route.replace(pattern, function() {
-                var match, offset, output;
-                match = arguments[0], offset = arguments[arguments.length - 1];
+                var key, match, offset, option, output;
+                match = arguments[0], key = arguments[1], option = arguments[2], offset = arguments[arguments.length - 1];
                 if (type(options) === 'array') {
                   output = options[count];
                   count++;
-                  return output;
                 } else if (type(options) === 'object') {
-                  return options[match.slice(1)];
+                  key = match.slice(1);
+                  if (option === '?') {
+                    key = key.slice(0, -1);
+                  }
+                  output = options[key];
                 }
+                if (output === void 0 && option === '?') {
+                  output = '';
+                }
+                return output;
               });
             }
           };
